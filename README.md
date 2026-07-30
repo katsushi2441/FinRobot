@@ -1,3 +1,8 @@
+> **🇯🇵 Japanese-first derivative fork** — This fork adds a Japanese analyst layer
+> (`finrobot_jp/`, local-LLM friendly, Kurage brain API connectors). It is **not** the
+> official FinRobot product; "FinRobot" is a trademark of AI4Finance Foundation
+> (see `TRADEMARK_POLICY.md`). Japanese documentation: [README.JP.md](README.JP.md)
+
 
 # FinRobot: An Open-Source AI Agent Platform for Financial Applications using Large Language Models
 [![Downloads](https://static.pepy.tech/badge/finrobot)]([https://pepy.tech/project/finrobot](https://pepy.tech/project/finrobot))

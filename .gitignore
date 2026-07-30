@@ -39,4 +39,6 @@ venv/
 .app.pid
 finrobot_equity/logs/
 finrobot_equity/web_app/data/*.db
-finrobot_equity/core/output/
+finrobot_equity/core/output/.venv-jp/
+__pycache__/
+*.pyc
