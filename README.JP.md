@@ -28,11 +28,11 @@ python tutorials_jp/market_report_ja.py 7203.T
 
 | provider | 用途 | 主な環境変数 |
 |---|---|---|
-| `ollama` (既定) | 無料・ローカル | `OLLAMA_URL`, `OLLAMA_MODEL` |
-| `deepseek` | 低コストAPI | `DEEPSEEK_API_KEY`, `DEEPSEEK_MODEL` |
+| `deepseek` (既定) | 低コストAPI。x402課金レールと同じ系列 | `DEEPSEEK_API_KEY`, `DEEPSEEK_MODEL` |
+| `ollama` | セルフホスト・ローカルLLM | `OLLAMA_URL`, `OLLAMA_MODEL` |
 | `openai` | OpenAI互換全般 | `OPENAI_BASE_URL`, `OPENAI_API_KEY`, `OPENAI_MODEL` |
 
-思考型モデル(gemma系等)向けに `think:false` を明示するなど、ローカルLLM運用の落とし穴に対処済み。
+思考型のローカルモデル向けに `think:false` を明示するなど、運用の落とし穴に対処済み。
 
 ### 3. Kurage判断API接続 (`finrobot_jp.kbrain`)
 
@@ -45,6 +45,7 @@ Kurageシリーズの判断API（[kcbrain](https://kcbrain.exbridge.jp/)=暗号�
 ```bash
 python3 -m venv .venv-jp
 .venv-jp/bin/pip install yfinance pandas requests
+export DEEPSEEK_API_KEY=sk-...   # 既定プロバイダ(deepseek)を使う場合
 .venv-jp/bin/python tutorials_jp/market_report_ja.py 7203.T
 ```
 

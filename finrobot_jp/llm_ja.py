@@ -2,10 +2,10 @@
 """日本語出力に調整したLLMバックエンド.
 
 環境変数だけで切り替える:
-  FINROBOT_JP_LLM=ollama (既定) | deepseek | openai
-  - ollama:   OLLAMA_URL (既定 http://127.0.0.1:11434), OLLAMA_MODEL (既定 gemma4:12b-it-qat)
+  FINROBOT_JP_LLM=deepseek (既定) | ollama | openai
+  - deepseek: DEEPSEEK_API_KEY, DEEPSEEK_MODEL (既定 deepseek-chat)。x402課金レールと同じ系列
+  - ollama:   OLLAMA_URL (既定 http://127.0.0.1:11434), OLLAMA_MODEL (必須)
               思考型モデル対策として /api/generate に think:false を明示する
-  - deepseek: DEEPSEEK_API_KEY, DEEPSEEK_MODEL (既定 deepseek-chat)
   - openai:   OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL (OpenAI互換なら何でも)
 """
 from __future__ import annotations
@@ -17,7 +17,7 @@ import urllib.request
 
 class JapaneseLLM:
     def __init__(self, provider: str | None = None):
-        self.provider = (provider or os.environ.get("FINROBOT_JP_LLM", "ollama")).lower()
+        self.provider = (provider or os.environ.get("FINROBOT_JP_LLM", "deepseek")).lower()
 
     def complete(self, prompt: str, system: str = "", max_tokens: int = 4096,
                  temperature: float = 0.2, timeout: int = 300) -> str:
@@ -27,12 +27,14 @@ class JapaneseLLM:
 
     def _ollama(self, prompt, system, max_tokens, temperature, timeout) -> str:
         url = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434").rstrip("/")
-        model = os.environ.get("OLLAMA_MODEL", "gemma4:12b-it-qat")
+        model = os.environ.get("OLLAMA_MODEL", "")
+        if not model:
+            raise RuntimeError("OLLAMA_MODEL is required for provider=ollama")
         payload = {
             "model": model,
             "prompt": prompt,
             "system": system,
-            # 思考型モデル(gemma4等)では必須: 無効化しないと隠れ推論トークンが
+            # 思考型モデルでは必須: 無効化しないと隠れ推論トークンが
             # num_predictを食い潰し、responseが空になる
             "think": False,
             "stream": False,

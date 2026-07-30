@@ -12,7 +12,7 @@
   fx(kfxbrain)   : {"pairs":[{"pair":"EUR_USD", ...}]}
   stock(ksbrain) : POST /v1/evidence -> POST /v1/analyze/full
 
-provider="deepseek" を渡すとx402課金レール(DeepSeek)、Noneなら各brainの既定(無料ローカル)。
+外部利用は provider="deepseek"(x402課金レール)が基本。provider未指定は各brainの運営内部向け既定。
 """
 from __future__ import annotations
 
