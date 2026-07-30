@@ -19,7 +19,7 @@ class JapaneseLLM:
     def __init__(self, provider: str | None = None):
         self.provider = (provider or os.environ.get("FINROBOT_JP_LLM", "deepseek")).lower()
 
-    def complete(self, prompt: str, system: str = "", max_tokens: int = 4096,
+    def complete(self, prompt: str, system: str = "", max_tokens: int = 8192,
                  temperature: float = 0.2, timeout: int = 300) -> str:
         if self.provider == "ollama":
             return self._ollama(prompt, system, max_tokens, temperature, timeout)
@@ -73,4 +73,12 @@ class JapaneseLLM:
         )
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             data = json.loads(resp.read().decode("utf-8"))
-        return data["choices"][0]["message"]["content"].strip()
+        message = data["choices"][0]["message"]
+        content = (message.get("content") or "").strip()
+        if not content and message.get("reasoning_content"):
+            # 推論型モデル(DeepSeek等)はmax_tokensが小さいと推論だけで枠を使い切り
+            # contentが空になる。無言で空を返さず原因が分かるエラーにする
+            raise RuntimeError(
+                "empty content from reasoning model; increase max_tokens "
+                f"(finish_reason={data['choices'][0].get('finish_reason')})")
+        return content
