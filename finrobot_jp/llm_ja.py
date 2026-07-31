@@ -66,19 +66,24 @@ class JapaneseLLM:
         messages.append({"role": "user", "content": prompt})
         payload = {"model": model, "messages": messages,
                    "max_tokens": max_tokens, "temperature": temperature}
-        req = urllib.request.Request(
-            f"{base.rstrip('/')}/chat/completions",
-            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-            headers={"Content-Type": "application/json", "Authorization": f"Bearer {key}"},
-        )
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-        message = data["choices"][0]["message"]
-        content = (message.get("content") or "").strip()
-        if not content and message.get("reasoning_content"):
-            # 推論型モデル(DeepSeek等)はmax_tokensが小さいと推論だけで枠を使い切り
-            # contentが空になる。無言で空を返さず原因が分かるエラーにする
-            raise RuntimeError(
-                "empty content from reasoning model; increase max_tokens "
-                f"(finish_reason={data['choices'][0].get('finish_reason')})")
-        return content
+        # 推論型モデル(DeepSeek等)は間欠的に「contentが空でreasoningのみ」を返す
+        # ことがある(トークン不足時だけでなくfinish_reason=stopでも発生)。
+        # 空contentは黙って返さず、リトライしてから原因が分かるエラーにする
+        last_finish = None
+        for _ in range(3):
+            req = urllib.request.Request(
+                f"{base.rstrip('/')}/chat/completions",
+                data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {key}"},
+            )
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            message = data["choices"][0]["message"]
+            content = (message.get("content") or "").strip()
+            if content:
+                return content
+            last_finish = data["choices"][0].get("finish_reason")
+            if not message.get("reasoning_content"):
+                break
+        raise RuntimeError(
+            f"empty content from reasoning model after retries (finish_reason={last_finish})")
