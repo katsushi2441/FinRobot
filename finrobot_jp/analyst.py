@@ -59,7 +59,7 @@ class JapaneseMarketAnalyst:
         return {"info": info, "price_summary": {k: v for k, v in summary.items() if v is not None}}
 
     def brain_judgment(self, symbol: str, market: str, data: dict) -> dict | None:
-        """kbrainが設定されていれば所見を取得(fail-open: 失敗してもレポートは出す)."""
+        """支払いウォレットが設定されていれば有料判断を取得(fail-open: 失敗してもレポートは出す)."""
         if market not in ("crypto", "fx") or not self.brain.available(market):
             return None
         try:

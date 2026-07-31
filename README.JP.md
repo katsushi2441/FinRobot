@@ -38,7 +38,9 @@ python tutorials_jp/market_report_ja.py 7203.T
 
 Kurageシリーズの判断API（[kcbrain](https://kcbrain.exbridge.jp/)=暗号資産 /
 [kfxbrain](https://kfxbrain.exbridge.jp/)=FX / [ksbrain](https://ksbrain.exbridge.jp/)=日本株）を
-レポートの所見ソースとして組み込めます。未設定でもレポート生成は動作します(fail-open)。
+レポートの所見ソースとして組み込めます。判断APIは**有料**で、呼び出しごとに
+Bankr x402(Base USDC)で自動支払いします(`KURAGE_X402_WALLET_KEY` が必要。
+kcbrain \$0.001 / fxbrain \$0.05 / ksbrain \$0.001〜)。未設定でもレポート生成は動作します(fail-open)。
 
 ## セットアップ (日本語層のみ)
 
